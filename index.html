@@ -447,93 +447,6 @@
             border-left: 4px solid #4A90E2;
         }
 
-        /* カテゴリー管理 */
-        .category-management {
-            background: #F8F9FA;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .category-management h3 {
-            color: #2C5AA0;
-            margin-bottom: 15px;
-        }
-
-        .category-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .category-tag {
-            background: white;
-            border: 2px solid #4A90E2;
-            color: #4A90E2;
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .category-tag .remove-btn {
-            background: #FF6B6B;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            line-height: 1;
-        }
-
-        .category-add-form {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .category-add-form input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #E0E0E0;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .danger-zone {
-            background: #FFF5F5;
-            border: 2px solid #FF6B6B;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-
-        .danger-zone h3 {
-            color: #FF6B6B;
-            margin-bottom: 15px;
-        }
-
-        .danger-btn {
-            background: #FF6B6B;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            margin-right: 10px;
-        }
-
-        .danger-btn:hover {
-            background: #FF5252;
-        }
-
         /* モーダル */
         .modal {
             display: none;
@@ -655,14 +568,12 @@
                     <div class="add-form">
                         <input type="text" id="itemName" placeholder="商品名 *">
                         <select id="category">
-                    <option value="">カテゴリー選択 *</option>
-                    <option value="__NEW__">➕ 新しいカテゴリーを追加...</option>
+                            <option value="">カテゴリー選択 *</option>
                         </select>
                         <input type="number" id="quantity" placeholder="数量 *" min="0">
                         <input type="number" id="unitPrice" placeholder="単価（任意）" min="0">
                         <select id="manufacturer">
-                    <option value="">メーカーを選択</option>
-                    <option value="__NEW__">➕ 新しいメーカーを追加...</option>
+                            <option value="">メーカーを選択</option>
                         </select>
                         <textarea id="notes" placeholder="備考（任意）" rows="2"></textarea>
                         <select id="location">
@@ -675,30 +586,12 @@
                         <button class="add-btn" onclick="addInventory()">➕ 在庫を追加</button>
                     </div>
 
-                    <!-- カテゴリー管理 -->
+                    
                     <div class="category-section" style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                        <h3 style="color: #4A90E2; margin-bottom: 15px;">🏷️ カテゴリー管理</h3>
-                        <div class="category-list" id="categoryListInventory" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                            <!-- カテゴリータグがここに表示されます -->
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="newCategoryInputInventory" placeholder="新しいカテゴリー名を入力" style="flex: 1; padding: 10px; border: 2px solid #E0E0E0; border-radius: 8px; font-size: 14px;">
-                            <button onclick="window.addCategory()" class="btn btn-small" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #4A90E2 0%, #2C5AA0 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">追加</button>
                         </div>
                     </div>
 
-                    <!-- メーカー管理 -->
-                    <div class="category-section" style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                        <h3 style="color: #4A90E2; margin-bottom: 15px;">🏭 メーカー管理</h3>
-                        <div class="category-list" id="manufacturerListInventory" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                            <!-- メーカータグがここに表示されます -->
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="newManufacturerInputInventory" placeholder="新しいメーカー名を入力" style="flex: 1; padding: 10px; border: 2px solid #E0E0E0; border-radius: 8px; font-size: 14px;">
-                            <button onclick="window.addManufacturer()" class="btn btn-small" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #4A90E2 0%, #2C5AA0 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">追加</button>
-                        </div>
-                    </div>
-
+                    
                     <div class="search-bar">
                         <input type="text" id="searchInput" placeholder="🔍 商品名で検索" oninput="filterInventory()">
                         <select id="categoryFilter" onchange="filterInventory()">
@@ -740,15 +633,8 @@
                             </div>
                         </div>
 
-                        <!-- カテゴリー管理 -->
+                        
                         <div class="category-management">
-                            <h3>🏷️ カテゴリー管理</h3>
-                            <div class="category-list" id="categoryList">
-                                <!-- カテゴリータグがここに表示されます -->
-                            </div>
-                            <div class="category-add-form">
-                                <input type="text" id="newCategoryInput" placeholder="新しいカテゴリー名を入力">
-                                <button class="btn btn-small" onclick="addCategory()">追加</button>
                             </div>
                         </div>
 
@@ -821,8 +707,7 @@
                 <input type="number" id="editUnitPrice" min="0">
                     <label>メーカー名</label>
                     <select id="editManufacturer">
-                    <option value="">メーカーを選択</option>
-                    <option value="__NEW__">➕ 新しいメーカーを追加...</option>
+                        <option value="">メーカーを選択</option>
                     </select>
                     <label>備考（任意）</label>
                     <textarea id="editNotes" rows="3"></textarea>
@@ -1403,13 +1288,20 @@
                 if (!select) return;
                 const currentValue = select.value;
                 select.innerHTML = '<option value="">メーカーを選択</option>';
-            select.innerHTML += '<option value=\"__NEW__\">➕ 新しいメーカーを追加...</option>';
+                
                 window.allManufacturers.forEach(m => {
                     const option = document.createElement('option');
                     option.value = m.name;
                     option.textContent = m.name;
                     select.appendChild(option);
                 });
+                
+                // __NEW__ オプションを最後に追加
+                const newOption = document.createElement('option');
+                newOption.value = '__NEW__';
+                newOption.textContent = '➕ 新しいメーカーを追加...';
+                select.appendChild(newOption);
+                
                 select.value = currentValue;
             });
         }
