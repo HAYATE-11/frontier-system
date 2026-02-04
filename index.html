@@ -1423,9 +1423,9 @@ document.getElementById('category').addEventListener('change', async function() 
         const newCategory = prompt('新しいカテゴリー名を入力してください:');
         if (newCategory && newCategory.trim()) {
             try {
-                await db.collection('categories').add({
+                await addDoc(collection(db, 'categories'), {
                     name: newCategory.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadCategories();
                 this.value = newCategory.trim();
@@ -1447,9 +1447,9 @@ document.getElementById('editCategory').addEventListener('change', async functio
         const newCategory = prompt('新しいカテゴリー名を入力してください:');
         if (newCategory && newCategory.trim()) {
             try {
-                await db.collection('categories').add({
+                await addDoc(collection(db, 'categories'), {
                     name: newCategory.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadCategories();
                 this.value = newCategory.trim();
@@ -1471,9 +1471,9 @@ document.getElementById('manufacturer').addEventListener('change', async functio
         const newManufacturer = prompt('新しいメーカー名を入力してください:');
         if (newManufacturer && newManufacturer.trim()) {
             try {
-                await db.collection('manufacturers').add({
+                await addDoc(collection(db, 'manufacturers'), {
                     name: newManufacturer.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadManufacturers();
                 this.value = newManufacturer.trim();
@@ -1495,9 +1495,9 @@ document.getElementById('editManufacturer').addEventListener('change', async fun
         const newManufacturer = prompt('新しいメーカー名を入力してください:');
         if (newManufacturer && newManufacturer.trim()) {
             try {
-                await db.collection('manufacturers').add({
+                await addDoc(collection(db, 'manufacturers'), {
                     name: newManufacturer.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadManufacturers();
                 this.value = newManufacturer.trim();
@@ -1527,16 +1527,6 @@ document.getElementById('editManufacturer').addEventListener('change', async fun
                 await deleteDoc(doc(window.db, 'manufacturers', id));
                 await loadManufacturers();
 
-// カテゴリー選択時の処理（インライン追加）
-document.getElementById('category').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newCategory = prompt('新しいカテゴリー名を入力してください:');
-        if (newCategory && newCategory.trim()) {
-            try {
-                await db.collection('categories').add({
-                    name: newCategory.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
                 await loadCategories();
                 this.value = newCategory.trim();
                 alert('カテゴリーを追加しました: ' + newCategory.trim());
@@ -1557,9 +1547,9 @@ document.getElementById('editCategory').addEventListener('change', async functio
         const newCategory = prompt('新しいカテゴリー名を入力してください:');
         if (newCategory && newCategory.trim()) {
             try {
-                await db.collection('categories').add({
+                await addDoc(collection(db, 'categories'), {
                     name: newCategory.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadCategories();
                 this.value = newCategory.trim();
@@ -1581,9 +1571,9 @@ document.getElementById('manufacturer').addEventListener('change', async functio
         const newManufacturer = prompt('新しいメーカー名を入力してください:');
         if (newManufacturer && newManufacturer.trim()) {
             try {
-                await db.collection('manufacturers').add({
+                await addDoc(collection(db, 'manufacturers'), {
                     name: newManufacturer.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadManufacturers();
                 this.value = newManufacturer.trim();
@@ -1605,9 +1595,9 @@ document.getElementById('editManufacturer').addEventListener('change', async fun
         const newManufacturer = prompt('新しいメーカー名を入力してください:');
         if (newManufacturer && newManufacturer.trim()) {
             try {
-                await db.collection('manufacturers').add({
+                await addDoc(collection(db, 'manufacturers'), {
                     name: newManufacturer.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
                 await loadManufacturers();
                 this.value = newManufacturer.trim();
