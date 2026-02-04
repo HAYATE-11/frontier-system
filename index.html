@@ -904,6 +904,14 @@
                     option.textContent = cat.name;
                     select.appendChild(option);
                 });
+                
+                // Add __NEW__ option for add/edit selects (not for filter)
+                if (index !== 2) {
+                    const newOption = document.createElement('option');
+                    newOption.value = '__NEW__';
+                    newOption.textContent = '➕ 新しいカテゴリーを追加...';
+                    select.appendChild(newOption);
+                }
 
                 select.value = currentValue;
             });
@@ -1365,6 +1373,13 @@
                     option.textContent = m.name;
                     select.appendChild(option);
                 });
+                
+                // Add __NEW__ option at the end
+                const newOption = document.createElement('option');
+                newOption.value = '__NEW__';
+                newOption.textContent = '➕ 新しいメーカーを追加...';
+                select.appendChild(newOption);
+                
                 select.value = currentValue;
             });
         }
