@@ -655,14 +655,14 @@
                     <div class="add-form">
                         <input type="text" id="itemName" placeholder="商品名 *">
                         <select id="category">
-                            <option value="">カテゴリー選択 *</option>
-                            <option value="__NEW__">➕ 新しいカテゴリーを追加...</option>
+                    <option value="">カテゴリー選択 *</option>
+                    <option value="__NEW__">➕ 新しいカテゴリーを追加...</option>
                         </select>
                         <input type="number" id="quantity" placeholder="数量 *" min="0">
                         <input type="number" id="unitPrice" placeholder="単価（任意）" min="0">
                         <select id="manufacturer">
-                            <option value="">メーカーを選択</option>
-                            <option value="__NEW__">➕ 新しいメーカーを追加...</option>
+                    <option value="">メーカーを選択</option>
+                    <option value="__NEW__">➕ 新しいメーカーを追加...</option>
                         </select>
                         <textarea id="notes" placeholder="備考（任意）" rows="2"></textarea>
                         <select id="location">
@@ -673,6 +673,30 @@
                             <option value="3F">3F</option>
                         </select>
                         <button class="add-btn" onclick="addInventory()">➕ 在庫を追加</button>
+                    </div>
+
+                    <!-- カテゴリー管理 -->
+                    <div class="category-section" style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="color: #4A90E2; margin-bottom: 15px;">🏷️ カテゴリー管理</h3>
+                        <div class="category-list" id="categoryListInventory" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                            <!-- カテゴリータグがここに表示されます -->
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="newCategoryInputInventory" placeholder="新しいカテゴリー名を入力" style="flex: 1; padding: 10px; border: 2px solid #E0E0E0; border-radius: 8px; font-size: 14px;">
+                            <button onclick="window.addCategory()" class="btn btn-small" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #4A90E2 0%, #2C5AA0 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">追加</button>
+                        </div>
+                    </div>
+
+                    <!-- メーカー管理 -->
+                    <div class="category-section" style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="color: #4A90E2; margin-bottom: 15px;">🏭 メーカー管理</h3>
+                        <div class="category-list" id="manufacturerListInventory" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                            <!-- メーカータグがここに表示されます -->
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="newManufacturerInputInventory" placeholder="新しいメーカー名を入力" style="flex: 1; padding: 10px; border: 2px solid #E0E0E0; border-radius: 8px; font-size: 14px;">
+                            <button onclick="window.addManufacturer()" class="btn btn-small" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #4A90E2 0%, #2C5AA0 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">追加</button>
+                        </div>
                     </div>
 
                     <div class="search-bar">
@@ -716,7 +740,19 @@
                             </div>
                         </div>
 
-                        <div class="section-box">
+                        <!-- カテゴリー管理 -->
+                        <div class="category-management">
+                            <h3>🏷️ カテゴリー管理</h3>
+                            <div class="category-list" id="categoryList">
+                                <!-- カテゴリータグがここに表示されます -->
+                            </div>
+                            <div class="category-add-form">
+                                <input type="text" id="newCategoryInput" placeholder="新しいカテゴリー名を入力">
+                                <button class="btn btn-small" onclick="addCategory()">追加</button>
+                            </div>
+                        </div>
+
+                                                <div class="section-box">
                             <h3>📊 レポート出力</h3>
                             <button class="danger-btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);" onclick="exportUserReportCSV()">📊 ユーザー別集計CSV</button>
                         </div>
@@ -785,8 +821,8 @@
                 <input type="number" id="editUnitPrice" min="0">
                     <label>メーカー名</label>
                     <select id="editManufacturer">
-                        <option value="">メーカーを選択</option>
-                                <option value="__NEW__">➕ 新しいメーカーを追加...</option>
+                    <option value="">メーカーを選択</option>
+                    <option value="__NEW__">➕ 新しいメーカーを追加...</option>
                     </select>
                     <label>備考（任意）</label>
                     <textarea id="editNotes" rows="3"></textarea>
@@ -904,14 +940,6 @@
                     option.textContent = cat.name;
                     select.appendChild(option);
                 });
-                
-                // Add __NEW__ option for add/edit selects (not for filter)
-                if (index !== 2) {
-                    const newOption = document.createElement('option');
-                    newOption.value = '__NEW__';
-                    newOption.textContent = '➕ 新しいカテゴリーを追加...';
-                    select.appendChild(newOption);
-                }
 
                 select.value = currentValue;
             });
@@ -1367,19 +1395,13 @@
                 if (!select) return;
                 const currentValue = select.value;
                 select.innerHTML = '<option value="">メーカーを選択</option>';
+            select.innerHTML += '<option value=\"__NEW__\">➕ 新しいメーカーを追加...</option>';
                 window.allManufacturers.forEach(m => {
                     const option = document.createElement('option');
                     option.value = m.name;
                     option.textContent = m.name;
                     select.appendChild(option);
                 });
-                
-                // Add __NEW__ option at the end
-                const newOption = document.createElement('option');
-                newOption.value = '__NEW__';
-                newOption.textContent = '➕ 新しいメーカーを追加...';
-                select.appendChild(newOption);
-                
                 select.value = currentValue;
             });
         }
@@ -1416,103 +1438,6 @@
                 await addDoc(collection(window.db, 'manufacturers'), { name });
                 input.value = '';
                 await loadManufacturers();
-
-// カテゴリー選択時の処理（インライン追加）
-document.getElementById('category').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newCategory = prompt('新しいカテゴリー名を入力してください:');
-        if (newCategory && newCategory.trim()) {
-            try {
-                await addDoc(collection(db, 'categories'), {
-                    name: newCategory.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadCategories();
-                this.value = newCategory.trim();
-                alert('カテゴリーを追加しました: ' + newCategory.trim());
-            } catch (error) {
-                console.error('カテゴリー追加エラー:', error);
-                alert('カテゴリーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
-// 編集モーダルのカテゴリー選択時の処理
-document.getElementById('editCategory').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newCategory = prompt('新しいカテゴリー名を入力してください:');
-        if (newCategory && newCategory.trim()) {
-            try {
-                await addDoc(collection(db, 'categories'), {
-                    name: newCategory.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadCategories();
-                this.value = newCategory.trim();
-                alert('カテゴリーを追加しました: ' + newCategory.trim());
-            } catch (error) {
-                console.error('カテゴリー追加エラー:', error);
-                alert('カテゴリーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
-// メーカー選択時の処理（インライン追加）
-document.getElementById('manufacturer').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newManufacturer = prompt('新しいメーカー名を入力してください:');
-        if (newManufacturer && newManufacturer.trim()) {
-            try {
-                await addDoc(collection(db, 'manufacturers'), {
-                    name: newManufacturer.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadManufacturers();
-                this.value = newManufacturer.trim();
-                alert('メーカーを追加しました: ' + newManufacturer.trim());
-            } catch (error) {
-                console.error('メーカー追加エラー:', error);
-                alert('メーカーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
-// 編集モーダルのメーカー選択時の処理
-document.getElementById('editManufacturer').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newManufacturer = prompt('新しいメーカー名を入力してください:');
-        if (newManufacturer && newManufacturer.trim()) {
-            try {
-                await addDoc(collection(db, 'manufacturers'), {
-                    name: newManufacturer.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadManufacturers();
-                this.value = newManufacturer.trim();
-                alert('メーカーを追加しました: ' + newManufacturer.trim());
-            } catch (error) {
-                console.error('メーカー追加エラー:', error);
-                alert('メーカーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
                 alert('メーカーを追加しました');
             } catch (error) {
                 console.error('メーカー追加エラー:', error);
@@ -1526,93 +1451,6 @@ document.getElementById('editManufacturer').addEventListener('change', async fun
             try {
                 await deleteDoc(doc(window.db, 'manufacturers', id));
                 await loadManufacturers();
-
-                await loadCategories();
-                this.value = newCategory.trim();
-                alert('カテゴリーを追加しました: ' + newCategory.trim());
-            } catch (error) {
-                console.error('カテゴリー追加エラー:', error);
-                alert('カテゴリーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
-// 編集モーダルのカテゴリー選択時の処理
-document.getElementById('editCategory').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newCategory = prompt('新しいカテゴリー名を入力してください:');
-        if (newCategory && newCategory.trim()) {
-            try {
-                await addDoc(collection(db, 'categories'), {
-                    name: newCategory.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadCategories();
-                this.value = newCategory.trim();
-                alert('カテゴリーを追加しました: ' + newCategory.trim());
-            } catch (error) {
-                console.error('カテゴリー追加エラー:', error);
-                alert('カテゴリーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
-// メーカー選択時の処理（インライン追加）
-document.getElementById('manufacturer').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newManufacturer = prompt('新しいメーカー名を入力してください:');
-        if (newManufacturer && newManufacturer.trim()) {
-            try {
-                await addDoc(collection(db, 'manufacturers'), {
-                    name: newManufacturer.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadManufacturers();
-                this.value = newManufacturer.trim();
-                alert('メーカーを追加しました: ' + newManufacturer.trim());
-            } catch (error) {
-                console.error('メーカー追加エラー:', error);
-                alert('メーカーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
-// 編集モーダルのメーカー選択時の処理
-document.getElementById('editManufacturer').addEventListener('change', async function() {
-    if (this.value === '__NEW__') {
-        const newManufacturer = prompt('新しいメーカー名を入力してください:');
-        if (newManufacturer && newManufacturer.trim()) {
-            try {
-                await addDoc(collection(db, 'manufacturers'), {
-                    name: newManufacturer.trim(),
-                    createdAt: serverTimestamp()
-                });
-                await loadManufacturers();
-                this.value = newManufacturer.trim();
-                alert('メーカーを追加しました: ' + newManufacturer.trim());
-            } catch (error) {
-                console.error('メーカー追加エラー:', error);
-                alert('メーカーの追加に失敗しました');
-                this.value = '';
-            }
-        } else {
-            this.value = '';
-        }
-    }
-});
-
                 alert('メーカーを削除しました');
             } catch (error) {
                 console.error('メーカー削除エラー:', error);
