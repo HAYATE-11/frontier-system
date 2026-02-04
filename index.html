@@ -600,6 +600,9 @@
                         <select id="userFilter" onchange="filterInventory()">
                             <option value="">すべての登録者</option>
                         </select>
+                        <select id="manufacturerFilter" onchange="filterInventory()">
+                            <option value="">すべてのメーカー</option>
+                        </select>
                     </div>
 
                     <div id="inventoryGrid" class="inventory-grid">
@@ -1113,12 +1116,14 @@
             const searchText = document.getElementById('searchInput').value.toLowerCase();
             const categoryFilter = document.getElementById('categoryFilter').value;
             const userFilter = document.getElementById('userFilter').value;
+            const manufacturerFilter = document.getElementById('manufacturerFilter') ? document.getElementById('manufacturerFilter').value : '';
 
             const filtered = window.allInventory.filter(item => {
                 const matchSearch = item.itemName.toLowerCase().includes(searchText);
                 const matchCategory = !categoryFilter || item.category === categoryFilter;
                 const matchUser = !userFilter || item.username === userFilter;
-                return matchSearch && matchCategory && matchUser;
+                const matchManufacturer = !manufacturerFilter || (item.manufacturer && item.manufacturer.toLowerCase().includes(manufacturerFilter.toLowerCase()));
+                return matchSearch && matchCategory && matchUser && matchManufacturer;
             });
 
             displayInventory(filtered);
@@ -1278,6 +1283,20 @@
             }));
             updateManufacturerList();
             updateManufacturerSelects();
+            
+            // メーカーフィルターを更新
+            const manufacturerFilter = document.getElementById('manufacturerFilter');
+            if (manufacturerFilter) {
+                const currentValue = manufacturerFilter.value;
+                manufacturerFilter.innerHTML = '<option value="">すべてのメーカー</option>';
+                window.allManufacturers.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m.name;
+                    option.textContent = m.name;
+                    manufacturerFilter.appendChild(option);
+                });
+                manufacturerFilter.value = currentValue;
+            }
         }
         
         // メーカー選択肢を更新
