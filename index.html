@@ -572,12 +572,12 @@
                             <option value="__NEW__">➕ 新しいカテゴリーを追加...</option>
                         </select>
                         <input type="number" id="quantity" placeholder="数量 *" min="0">
-                        <input type="number" id="unitPrice" placeholder="単価（任意）" min="0">
+                        <input type="number" id="unitPrice" placeholder="単価(任意)" min="0">
                         <select id="manufacturer">
                             <option value="">メーカーを選択</option>
                             <option value="__NEW__">➕ 新しいメーカーを追加...</option>
                         </select>
-                        <textarea id="notes" placeholder="備考（任意）" rows="2"></textarea>
+                        <textarea id="notes" placeholder="備考(任意)" rows="2"></textarea>
                         <select id="location">
                             <option value="">保管場所を選択 *</option>
                             <option value="1F">1F</option>
@@ -664,12 +664,12 @@
                         </div>
 
                         <div class="section-box">
-                            <h3>📦 総在庫数ランキング TOP5（ユーザー別）</h3>
+                            <h3>📦 総在庫数ランキング TOP5(ユーザー別)</h3>
                             <div id="userQuantityRanking"></div>
                         </div>
 
                         <div class="section-box">
-                            <h3>💰 総在庫金額ランキング TOP5（ユーザー別）</h3>
+                            <h3>💰 総在庫金額ランキング TOP5(ユーザー別)</h3>
                             <div id="userValueRanking"></div>
                         </div>
 
@@ -714,7 +714,7 @@
                     <select id="editManufacturer">
                         <option value="">メーカーを選択</option>
                     </select>
-                    <label>備考（任意）</label>
+                    <label>備考(任意)</label>
                     <textarea id="editNotes" rows="3"></textarea>
             </div>
             <div class="form-group">
@@ -762,7 +762,7 @@
         window.allManufacturers = [];
 
 
-        // デフォルトカテゴリー（提案A: 業務用）
+        // デフォルトカテゴリー(提案A: 業務用)
         const defaultCategories = ['資材', '工具', '消耗品', '部品', '機械・設備', '安全用品', 'その他'];
 
         // 匿名認証
@@ -797,7 +797,6 @@
             const snapshot = await getDocs(q);
             
             window.allCategories = [];
-        window.allManufacturers = [];
 
             snapshot.forEach(doc => {
                 window.allCategories.push({
@@ -831,7 +830,7 @@
                     select.appendChild(option);
                 });
 
-                // __NEW__ オプションを追加（カテゴリーフィルター以外）
+                // __NEW__ オプションを追加(カテゴリーフィルター以外)
                 if (index !== 2) {
                     const newOption = document.createElement('option');
                     newOption.value = '__NEW__';
@@ -843,7 +842,7 @@
             });
         }
 
-        // カテゴリーリスト表示（管理者画面）
+        // カテゴリーリスト表示(管理者画面)
         function updateCategoryList() {
             const list = document.getElementById('categoryList');
             if (!list) return;
@@ -889,7 +888,7 @@
                 });
 
                 if (input) input.value = '';
-                alert('カテゴリーを追加しました！');
+                alert('カテゴリーを追加しました!');
                 loadCategories();
             } catch (error) {
                 console.error('追加エラー:', error);
@@ -902,12 +901,12 @@
             const category = window.allCategories.find(cat => cat.id === id);
             if (!category) return;
 
-            if (!confirm(`カテゴリー「${category.name}」を削除しますか？`)) return;
+            if (!confirm(`カテゴリー「${category.name}」を削除しますか?`)) return;
 
             // このカテゴリーを使用している在庫があるか確認
             const hasInventory = window.allInventory.some(item => item.category === category.name);
             if (hasInventory) {
-                if (!confirm(`このカテゴリーを使用している在庫があります。本当に削除しますか？`)) return;
+                if (!confirm(`このカテゴリーを使用している在庫があります。本当に削除しますか?`)) return;
             }
 
             try {
@@ -917,6 +916,112 @@
             } catch (error) {
                 console.error('削除エラー:', error);
                 alert('カテゴリーの削除に失敗しました');
+            }
+        };
+
+        // メーカー一覧を読み込み
+        window.loadManufacturers = async function() {
+            const snapshot = await getDocs(collection(window.db, 'manufacturers'));
+            window.allManufacturers = snapshot.docs.map(doc => ({
+                id: doc.id,
+                name: doc.data().name
+            }));
+            updateManufacturerList();
+            updateManufacturerSelects();
+            
+            // メーカーフィルターを更新
+            const manufacturerFilter = document.getElementById('manufacturerFilter');
+            if (manufacturerFilter) {
+                const currentValue = manufacturerFilter.value;
+                manufacturerFilter.innerHTML = '<option value="">すべてのメーカー</option>';
+                window.allManufacturers.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m.name;
+                    option.textContent = m.name;
+                    manufacturerFilter.appendChild(option);
+                });
+                manufacturerFilter.value = currentValue;
+            }
+        };
+        
+        // メーカー選択肢を更新
+        function updateManufacturerSelects() {
+            const selects = ['manufacturer', 'editManufacturer'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (!select) return;
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">メーカーを選択</option>';
+                
+                window.allManufacturers.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m.name;
+                    option.textContent = m.name;
+                    select.appendChild(option);
+                });
+                
+                // __NEW__ オプションを最後に追加
+                const newOption = document.createElement('option');
+                newOption.value = '__NEW__';
+                newOption.textContent = '➕ 新しいメーカーを追加...';
+                select.appendChild(newOption);
+                
+                select.value = currentValue;
+            });
+        }
+        
+        // メーカーリスト表示を更新
+        function updateManufacturerList() {
+            const list = document.getElementById('manufacturerListInventory');
+            if (!list) return;
+            list.innerHTML = '';
+            window.allManufacturers.forEach(m => {
+                const tag = document.createElement('span');
+                tag.className = 'category-tag';
+                tag.innerHTML = `${m.name} <button onclick="deleteManufacturer('${m.id}')" style="background: none; border: none; color: #fff; cursor: pointer;">×</button>`;
+                list.appendChild(tag);
+            });
+        }
+        
+        // メーカーを追加
+        window.addManufacturer = async function() {
+            const input = document.getElementById('newManufacturerInputInventory');
+            const name = input.value.trim();
+            if (!name) {
+                alert('メーカー名を入力してください');
+                return;
+            }
+            
+            // 重複チェック
+            if (window.allManufacturers.some(m => m.name === name)) {
+                alert('このメーカーは既に存在します');
+                return;
+            }
+            
+            try {
+                await addDoc(collection(window.db, 'manufacturers'), { 
+                    name,
+                    createdAt: serverTimestamp()
+                });
+                input.value = '';
+                await loadManufacturers();
+                alert('メーカーを追加しました');
+            } catch (error) {
+                console.error('メーカー追加エラー:', error);
+                alert('メーカーの追加に失敗しました');
+            }
+        };
+        
+        // メーカーを削除
+        window.deleteManufacturer = async function(id) {
+            if (!confirm('このメーカーを削除しますか?')) return;
+            try {
+                await deleteDoc(doc(window.db, 'manufacturers', id));
+                await loadManufacturers();
+                alert('メーカーを削除しました');
+            } catch (error) {
+                console.error('メーカー削除エラー:', error);
+                alert('メーカーの削除に失敗しました');
             }
         };
 
@@ -930,7 +1035,7 @@
                 return;
             }
 
-            // メールアドレス形式チェック（Hayate は例外）
+            // メールアドレス形式チェック(Hayate は例外)
             if (username !== 'Hayate') {
                 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                 if (!emailRegex.test(username)) {
@@ -972,7 +1077,7 @@
                     }
                 }
             } else {
-                // 新規ユーザー（Hayate は承認済みで作成）
+                // 新規ユーザー(Hayate は承認済みで作成)
                 const docRef = await addDoc(usersRef, {
                     username: username,
                     createdAt: serverTimestamp(),
@@ -997,7 +1102,8 @@
             document.getElementById('currentUser').textContent = `👤 ${username}`;
 
             loadCategories();
-                loadInventory();
+            loadManufacturers(); // ★メーカーを読み込み
+            loadInventory();
         };
 
         // ログアウト
@@ -1073,7 +1179,7 @@
                 document.getElementById('manufacturer').value = '';
                 document.getElementById('notes').value = '';
 
-                alert('在庫を追加しました！');
+                alert('在庫を追加しました!');
                 loadInventory();
             } catch (error) {
                 console.error('追加エラー:', error);
@@ -1233,7 +1339,7 @@
                     updatedAt: serverTimestamp()
                 });
 
-                alert('在庫を更新しました！');
+                alert('在庫を更新しました!');
                 closeEditModal();
                 loadInventory();
             } catch (error) {
@@ -1244,7 +1350,7 @@
 
         // 削除
         window.deleteInventory = async function(id) {
-            if (!confirm('この在庫を削除しますか？')) return;
+            if (!confirm('この在庫を削除しますか?')) return;
 
             try {
                 await deleteDoc(doc(db, 'inventory', id));
@@ -1275,110 +1381,8 @@
             try {
                 // カテゴリー読み込み
                 await loadCategories();
-        
-        // メーカー一覧を読み込み
-        window.loadManufacturers = async function() {
-            const snapshot = await getDocs(collection(window.db, 'manufacturers'));
-            window.allManufacturers = snapshot.docs.map(doc => ({
-                id: doc.id,
-                name: doc.data().name
-            }));
-            updateManufacturerList();
-            updateManufacturerSelects();
-            
-            // メーカーフィルターを更新
-            const manufacturerFilter = document.getElementById('manufacturerFilter');
-            if (manufacturerFilter) {
-                const currentValue = manufacturerFilter.value;
-                manufacturerFilter.innerHTML = '<option value="">すべてのメーカー</option>';
-                window.allManufacturers.forEach(m => {
-                    const option = document.createElement('option');
-                    option.value = m.name;
-                    option.textContent = m.name;
-                    manufacturerFilter.appendChild(option);
-                });
-                manufacturerFilter.value = currentValue;
-            }
-        }
-        
-        // メーカー選択肢を更新
-        function updateManufacturerSelects() {
-            const selects = ['manufacturer', 'editManufacturer'];
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-                const currentValue = select.value;
-                select.innerHTML = '<option value="">メーカーを選択</option>';
-                
-                window.allManufacturers.forEach(m => {
-                    const option = document.createElement('option');
-                    option.value = m.name;
-                    option.textContent = m.name;
-                    select.appendChild(option);
-                });
-                
-                // __NEW__ オプションを最後に追加
-                const newOption = document.createElement('option');
-                newOption.value = '__NEW__';
-                newOption.textContent = '➕ 新しいメーカーを追加...';
-                select.appendChild(newOption);
-                
-                select.value = currentValue;
-            });
-        }
-        
-        // メーカーリスト表示を更新
-        function updateManufacturerList() {
-            const list = document.getElementById('manufacturerListInventory');
-            if (!list) return;
-            list.innerHTML = '';
-            window.allManufacturers.forEach(m => {
-                const tag = document.createElement('span');
-                tag.className = 'category-tag';
-                tag.innerHTML = `${m.name} <button onclick="deleteManufacturer('${m.id}')" style="background: none; border: none; color: #fff; cursor: pointer;">×</button>`;
-                list.appendChild(tag);
-            });
-        }
-        
-        // メーカーを追加
-        window.addManufacturer = async function() {
-            const input = document.getElementById('newManufacturerInputInventory');
-            const name = input.value.trim();
-            if (!name) {
-                alert('メーカー名を入力してください');
-                return;
-            }
-            
-            // 重複チェック
-            if (window.allManufacturers.some(m => m.name === name)) {
-                alert('このメーカーは既に存在します');
-                return;
-            }
-            
-            try {
-                await addDoc(collection(window.db, 'manufacturers'), { name });
-                input.value = '';
+                // メーカー読み込み
                 await loadManufacturers();
-                alert('メーカーを追加しました');
-            } catch (error) {
-                console.error('メーカー追加エラー:', error);
-                alert('メーカーの追加に失敗しました');
-            }
-        }
-        
-        // メーカーを削除
-        window.deleteManufacturer = async function(id) {
-            if (!confirm('このメーカーを削除しますか？')) return;
-            try {
-                await deleteDoc(doc(window.db, 'manufacturers', id));
-                await loadManufacturers();
-                alert('メーカーを削除しました');
-            } catch (error) {
-                console.error('メーカー削除エラー:', error);
-                alert('メーカーの削除に失敗しました');
-            }
-        }
-
 
                 // 統計データ
                 const totalItems = window.allInventory.reduce((sum, item) => sum + item.quantity, 0);
@@ -1415,7 +1419,7 @@
                     </div>
                 `).join('');
 
-                // ユーザーランキング計算（Hayate と システム を除外）
+                // ユーザーランキング計算(Hayate と システム を除外)
                 const userStats = {};
                 window.allInventory.forEach(item => {
                     const user = item.username;
@@ -1447,7 +1451,7 @@
                     </div>
                 `).join('');
 
-                // 総在庫数ランキング（ユーザー別）
+                // 総在庫数ランキング(ユーザー別)
                 const userQuantityRanking = Object.entries(userStats)
                     .sort((a, b) => b[1].quantity - a[1].quantity)
                     .slice(0, 5);
@@ -1459,7 +1463,7 @@
                     </div>
                 `).join('');
 
-                // 総在庫金額ランキング（ユーザー別）
+                // 総在庫金額ランキング(ユーザー別)
                 const userValueRanking = Object.entries(userStats)
                     .sort((a, b) => b[1].totalValue - a[1].totalValue)
                     .slice(0, 5);
@@ -1478,8 +1482,8 @@
 
         // 全在庫削除
         window.deleteAllInventory = async function() {
-            if (!confirm('全在庫データを削除しますか？この操作は取り消せません！')) return;
-            if (!confirm('本当に削除しますか？')) return;
+            if (!confirm('全在庫データを削除しますか?この操作は取り消せません!')) return;
+            if (!confirm('本当に削除しますか?')) return;
 
             try {
                 const snapshot = await getDocs(collection(db, 'inventory'));
@@ -1546,7 +1550,7 @@
         };
 
         // ユーザー管理
-        // ユーザー管理（承認・ブロック機能付き）
+        // ユーザー管理(承認・ブロック機能付き)
         window.showUserManagement = async function() {
             try {
                 const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -1675,7 +1679,7 @@
 
         // ユーザー承認
         window.approveUser = async function(userId) {
-            if (!confirm('このユーザーを承認しますか？')) return;
+            if (!confirm('このユーザーを承認しますか?')) return;
 
             try {
                 await updateDoc(doc(db, 'users', userId), {
@@ -1691,7 +1695,7 @@
 
         // ユーザーブロック
         window.blockUser = async function(userId) {
-            if (!confirm('このユーザーをブロックしますか？\nブロックされたユーザーはログインできなくなります。')) return;
+            if (!confirm('このユーザーをブロックしますか?\nブロックされたユーザーはログインできなくなります。')) return;
 
             try {
                 await updateDoc(doc(db, 'users', userId), {
@@ -1707,7 +1711,7 @@
 
         // ユーザーブロック解除
         window.unblockUser = async function(userId) {
-            if (!confirm('このユーザーのブロックを解除しますか？')) return;
+            if (!confirm('このユーザーのブロックを解除しますか?')) return;
 
             try {
                 await updateDoc(doc(db, 'users', userId), {
@@ -1721,7 +1725,7 @@
             }
         };
 
-        // カテゴリーのインライン追加（通常フォーム）
+        // カテゴリーのインライン追加(通常フォーム)
         document.getElementById('category').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newCategory = prompt('新しいカテゴリー名を入力してください:');
@@ -1745,7 +1749,7 @@
             }
         });
 
-        // カテゴリーのインライン追加（編集モーダル）
+        // カテゴリーのインライン追加(編集モーダル)
         document.getElementById('editCategory').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newCategory = prompt('新しいカテゴリー名を入力してください:');
@@ -1769,7 +1773,7 @@
             }
         });
 
-        // メーカーのインライン追加（通常フォーム）
+        // メーカーのインライン追加(通常フォーム)
         document.getElementById('manufacturer').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newManufacturer = prompt('新しいメーカー名を入力してください:');
@@ -1793,7 +1797,7 @@
             }
         });
 
-        // メーカーのインライン追加（編集モーダル）
+        // メーカーのインライン追加(編集モーダル)
         document.getElementById('editManufacturer').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newManufacturer = prompt('新しいメーカー名を入力してください:');
