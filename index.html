@@ -941,6 +941,14 @@
                     select.appendChild(option);
                 });
 
+                // __NEW__ オプションを追加（カテゴリーフィルター以外）
+                if (index !== 2) {
+                    const newOption = document.createElement('option');
+                    newOption.value = '__NEW__';
+                    newOption.textContent = '➕ 新しいカテゴリーを追加...';
+                    select.appendChild(newOption);
+                }
+
                 select.value = currentValue;
             });
         }
