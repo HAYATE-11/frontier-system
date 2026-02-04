@@ -1773,21 +1773,33 @@
         document.getElementById('manufacturer').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                console.log('入力されたメーカー名:', newManufacturer);
                 if (newManufacturer && newManufacturer.trim()) {
                     try {
-                        await addDoc(collection(db, 'manufacturers'), {
+                        console.log('Firestore に保存開始...');
+                        console.log('db:', db);
+                        console.log('collection:', collection);
+                        console.log('addDoc:', addDoc);
+                        
+                        const docRef = await addDoc(collection(db, 'manufacturers'), {
                             name: newManufacturer.trim(),
                             createdAt: serverTimestamp()
                         });
+                        console.log('保存成功。Document ID:', docRef.id);
+                        
                         await loadManufacturers();
                         this.value = newManufacturer.trim();
                         alert('メーカーを追加しました: ' + newManufacturer.trim());
                     } catch (error) {
-                        console.error('メーカー追加エラー:', error);
-                        alert('メーカーの追加に失敗しました');
+                        console.error('メーカー追加エラー（詳細）:', error);
+                        console.error('エラーコード:', error.code);
+                        console.error('エラーメッセージ:', error.message);
+                        alert('メーカーの追加に失敗しました
+エラー: ' + error.message);
                         this.value = '';
                     }
                 } else {
+                    console.log('入力がキャンセルされたか空白です');
                     this.value = '';
                 }
             }
