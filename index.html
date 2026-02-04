@@ -1807,6 +1807,103 @@
                 alert('ブロック解除に失敗しました');
             }
         };
+
+        // カテゴリーのインライン追加（通常フォーム）
+        document.getElementById('category').addEventListener('change', async function() {
+            if (this.value === '__NEW__') {
+                const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                if (newCategory && newCategory.trim()) {
+                    try {
+                        await addDoc(collection(db, 'categories'), {
+                            name: newCategory.trim(),
+                            createdAt: serverTimestamp()
+                        });
+                        await loadCategories();
+                        this.value = newCategory.trim();
+                        alert('カテゴリーを追加しました: ' + newCategory.trim());
+                    } catch (error) {
+                        console.error('カテゴリー追加エラー:', error);
+                        alert('カテゴリーの追加に失敗しました');
+                        this.value = '';
+                    }
+                } else {
+                    this.value = '';
+                }
+            }
+        });
+
+        // カテゴリーのインライン追加（編集モーダル）
+        document.getElementById('editCategory').addEventListener('change', async function() {
+            if (this.value === '__NEW__') {
+                const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                if (newCategory && newCategory.trim()) {
+                    try {
+                        await addDoc(collection(db, 'categories'), {
+                            name: newCategory.trim(),
+                            createdAt: serverTimestamp()
+                        });
+                        await loadCategories();
+                        this.value = newCategory.trim();
+                        alert('カテゴリーを追加しました: ' + newCategory.trim());
+                    } catch (error) {
+                        console.error('カテゴリー追加エラー:', error);
+                        alert('カテゴリーの追加に失敗しました');
+                        this.value = '';
+                    }
+                } else {
+                    this.value = '';
+                }
+            }
+        });
+
+        // メーカーのインライン追加（通常フォーム）
+        document.getElementById('manufacturer').addEventListener('change', async function() {
+            if (this.value === '__NEW__') {
+                const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                if (newManufacturer && newManufacturer.trim()) {
+                    try {
+                        await addDoc(collection(db, 'manufacturers'), {
+                            name: newManufacturer.trim(),
+                            createdAt: serverTimestamp()
+                        });
+                        await loadManufacturers();
+                        this.value = newManufacturer.trim();
+                        alert('メーカーを追加しました: ' + newManufacturer.trim());
+                    } catch (error) {
+                        console.error('メーカー追加エラー:', error);
+                        alert('メーカーの追加に失敗しました');
+                        this.value = '';
+                    }
+                } else {
+                    this.value = '';
+                }
+            }
+        });
+
+        // メーカーのインライン追加（編集モーダル）
+        document.getElementById('editManufacturer').addEventListener('change', async function() {
+            if (this.value === '__NEW__') {
+                const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                if (newManufacturer && newManufacturer.trim()) {
+                    try {
+                        await addDoc(collection(db, 'manufacturers'), {
+                            name: newManufacturer.trim(),
+                            createdAt: serverTimestamp()
+                        });
+                        await loadManufacturers();
+                        this.value = newManufacturer.trim();
+                        alert('メーカーを追加しました: ' + newManufacturer.trim());
+                    } catch (error) {
+                        console.error('メーカー追加エラー:', error);
+                        alert('メーカーの追加に失敗しました');
+                        this.value = '';
+                    }
+                } else {
+                    this.value = '';
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
