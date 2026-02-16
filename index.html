@@ -1833,24 +1833,6 @@
         };
 
         // カテゴリーのインライン追加（通常フォーム）
-        
-
-        // カテゴリーのインライン追加（編集モーダル）
-        
-
-        // メーカーのインライン追加（通常フォーム）
-        )
-
-        // メーカーのインライン追加（編集モーダル）
-        )
-
-    
-
-        
-
-        // ===== イベントリスナーの登録（関数定義後に実行） =====
-        
-        // カテゴリー選択でメーカー追加
         document.getElementById('category').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newCategory = prompt('新しいカテゴリー名を入力してください:');
@@ -1861,6 +1843,7 @@
                             createdAt: serverTimestamp()
                         });
                         await loadCategories();
+                        this.value = '';
                         this.value = newCategory.trim();
                         alert('カテゴリーを追加しました: ' + newCategory.trim());
                     } catch (error) {
@@ -1873,8 +1856,33 @@
                 }
             }
         });
-        
-        // メーカー選択で追加
+
+        // カテゴリーのインライン追加（編集モーダル）
+        document.getElementById('editCategory').addEventListener('change', async function() {
+            if (this.value === '__NEW__') {
+                const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                if (newCategory && newCategory.trim()) {
+                    try {
+                        await addDoc(collection(db, 'categories'), {
+                            name: newCategory.trim(),
+                            createdAt: serverTimestamp()
+                        });
+                        await loadCategories();
+                        this.value = '';
+                        this.value = newCategory.trim();
+                        alert('カテゴリーを追加しました: ' + newCategory.trim());
+                    } catch (error) {
+                        console.error('カテゴリー追加エラー:', error);
+                        alert('カテゴリーの追加に失敗しました');
+                        this.value = '';
+                    }
+                } else {
+                    this.value = '';
+                }
+            }
+        });
+
+        // メーカーのインライン追加（通常フォーム）
         document.getElementById('manufacturer').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newManufacturer = prompt('新しいメーカー名を入力してください:');
@@ -1901,33 +1909,9 @@
                     this.value = '';
                 }
             }
-        });
-        
-        // 編集: カテゴリー選択で追加
-        document.getElementById('editCategory').addEventListener('change', async function() {
-            if (this.value === '__NEW__') {
-                const newCategory = prompt('新しいカテゴリー名を入力してください:');
-                if (newCategory && newCategory.trim()) {
-                    try {
-                        await addDoc(collection(db, 'categories'), {
-                            name: newCategory.trim(),
-                            createdAt: serverTimestamp()
-                        });
-                        await loadCategories();
-                        this.value = newCategory.trim();
-                        alert('カテゴリーを追加しました: ' + newCategory.trim());
-                    } catch (error) {
-                        console.error('カテゴリー追加エラー:', error);
-                        alert('カテゴリーの追加に失敗しました');
-                        this.value = '';
-                    }
-                } else {
-                    this.value = '';
-                }
-            }
-        });
-        
-        // 編集: メーカー選択で追加
+        })
+
+        // メーカーのインライン追加（編集モーダル）
         document.getElementById('editManufacturer').addEventListener('change', async function() {
             if (this.value === '__NEW__') {
                 const newManufacturer = prompt('新しいメーカー名を入力してください:');
@@ -1953,9 +1937,132 @@
                     this.value = '';
                 }
             }
-        });
+        })
+
+    
+
         
-        console.log('✅ 全てのイベントリスナーを登録しました');
+
+        // ===== イベントリスナーの登録（DOMContentLoaded後に実行） =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // カテゴリー選択で追加
+            const categorySelect = document.getElementById('category');
+            if (categorySelect) {
+                categorySelect.addEventListener('change', async function() {
+                    if (this.value === '__NEW__') {
+                        const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                        if (newCategory && newCategory.trim()) {
+                            try {
+                                await addDoc(collection(db, 'categories'), {
+                                    name: newCategory.trim(),
+                                    createdAt: serverTimestamp()
+                                });
+                                await loadCategories();
+                                this.value = newCategory.trim();
+                                alert('カテゴリーを追加しました: ' + newCategory.trim());
+                            } catch (error) {
+                                console.error('カテゴリー追加エラー:', error);
+                                alert('カテゴリーの追加に失敗しました');
+                                this.value = '';
+                            }
+                        } else {
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+            
+            // メーカー選択で追加
+            const manufacturerSelect = document.getElementById('manufacturer');
+            if (manufacturerSelect) {
+                manufacturerSelect.addEventListener('change', async function() {
+                    if (this.value === '__NEW__') {
+                        const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                        if (newManufacturer && newManufacturer.trim()) {
+                            try {
+                                console.log('🔵 メーカー追加開始:', newManufacturer.trim());
+                                await addDoc(collection(db, 'manufacturers'), {
+                                    name: newManufacturer.trim(),
+                                    createdAt: serverTimestamp()
+                                });
+                                console.log('✅ Firestore追加成功');
+                                await loadManufacturers();
+                                console.log('✅ loadManufacturers完了');
+                                this.value = newManufacturer.trim();
+                                alert('メーカーを追加しました: ' + newManufacturer.trim());
+                            } catch (error) {
+                                console.error('❌ メーカー追加エラー:', error);
+                                console.error('❌ エラー詳細:', error.message);
+                                alert('メーカーの追加に失敗しました\n\nエラー: ' + error.message);
+                                this.value = '';
+                            }
+                        } else {
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+            
+            // 編集: カテゴリー選択で追加
+            const editCategorySelect = document.getElementById('editCategory');
+            if (editCategorySelect) {
+                editCategorySelect.addEventListener('change', async function() {
+                    if (this.value === '__NEW__') {
+                        const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                        if (newCategory && newCategory.trim()) {
+                            try {
+                                await addDoc(collection(db, 'categories'), {
+                                    name: newCategory.trim(),
+                                    createdAt: serverTimestamp()
+                                });
+                                await loadCategories();
+                                this.value = newCategory.trim();
+                                alert('カテゴリーを追加しました: ' + newCategory.trim());
+                            } catch (error) {
+                                console.error('カテゴリー追加エラー:', error);
+                                alert('カテゴリーの追加に失敗しました');
+                                this.value = '';
+                            }
+                        } else {
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+            
+            // 編集: メーカー選択で追加
+            const editManufacturerSelect = document.getElementById('editManufacturer');
+            if (editManufacturerSelect) {
+                editManufacturerSelect.addEventListener('change', async function() {
+                    if (this.value === '__NEW__') {
+                        const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                        if (newManufacturer && newManufacturer.trim()) {
+                            try {
+                                console.log('🔵 メーカー追加開始(編集画面):', newManufacturer.trim());
+                                await addDoc(collection(db, 'manufacturers'), {
+                                    name: newManufacturer.trim(),
+                                    createdAt: serverTimestamp()
+                                });
+                                console.log('✅ Firestore追加成功');
+                                await loadManufacturers();
+                                console.log('✅ loadManufacturers完了');
+                                this.value = newManufacturer.trim();
+                                alert('メーカーを追加しました: ' + newManufacturer.trim());
+                            } catch (error) {
+                                console.error('❌ メーカー追加エラー:', error);
+                                console.error('❌ エラー詳細:', error.message);
+                                alert('メーカーの追加に失敗しました\n\nエラー: ' + error.message);
+                                this.value = '';
+                            }
+                        } else {
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+            
+            console.log('✅ 全てのイベントリスナーを登録しました');
+        });
     
 </script>
 </body>
