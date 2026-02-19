@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フロンティア在庫管理アプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ログイン画面 */
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* メインアプリ画面 */
+        .app-container {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* タブ */
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab:hover {
+            background: #ececec;
+        }
+
+        /* タブコンテンツ */
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 在庫追加フォーム */
+        .inventory-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-row textarea {
+            grid-column: 1 / -1;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* 検索バー */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* 在庫カード */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .inventory-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .inventory-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .card-manufacturer {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            background: #f0f3ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .card-info {
+            margin-bottom: 10px;
+        }
+
+        .card-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .card-notes {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 管理者画面 */
+        .admin-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .admin-password {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .admin-password input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.unlocked {
+            display: block;
+        }
+
+        .admin-list {
+            list-style: none;
+        }
+
+        .admin-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        /* ランキング */
+        .ranking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .ranking-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .ranking-card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* ユーティリティ */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div class="login-container" id="loginContainer">
+        <h1>🏗️ フロンティア在庫管理</h1>
+        <div class="form-group">
+            <label for="usernameInput">ユーザー名</label>
+            <input type="text" id="usernameInput" placeholder="ユーザー名を入力">
+        </div>
+        <div class="form-group">
+            <label for="passwordInput">パスワード</label>
+            <input type="password" id="passwordInput" placeholder="パスワードを入力">
+        </div>
+        <button class="btn" onclick="login()">ログイン</button>
+    </div>
+
+    <!-- メインアプリ画面 -->
+    <div class="container">
+        <div class="app-container" id="appContainer">
+            <div class="app-header">
+                <h1>🏗️ フロンティア在庫管理</h1>
+                <div class="user-info">
+                    <span id="currentUserName">ユーザー名</span>
+                    <button class="btn btn-small" onclick="logout()">ログアウト</button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('inventory')">在庫管理</button>
+                <button class="tab" onclick="switchTab('admin')">管理者</button>
+            </div>
+
+            <!-- 在庫タブ -->
+            <div class="tab-content active" id="inventoryTab">
+                <!-- 在庫追加フォーム -->
+                <div class="inventory-form">
+                    <h3 class="mb-20">📦 新規在庫追加</h3>
+                    <div class="form-row">
+                        <input type="text" id="productName" placeholder="商品名 *">
+                        <select id="category">
+                            <option value="">カテゴリーを選択...</option>
+                        </select>
+                        <input type="number" id="quantity" placeholder="数量 *" min="0">
+                        <input type="number" id="unitPrice" placeholder="単価 *" min="0">
+                        <input type="text" id="location" placeholder="保管場所 *">
+                        <select id="manufacturer">
+                            <option value="">メーカーを選択...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <textarea id="notes" placeholder="備考（オプション）"></textarea>
+                    </div>
+                    <button class="btn" onclick="addInventory()">在庫を追加</button>
+                </div>
+
+                <!-- 検索バー -->
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="🔍 商品名、メーカー、カテゴリーで検索..." oninput="filterInventory()">
+                </div>
+
+                <!-- ランキング表示 -->
+                <div class="ranking-grid mb-20" id="rankingDisplay"></div>
+
+                <!-- 在庫一覧 -->
+                <div class="inventory-grid" id="inventoryGrid"></div>
+            </div>
+
+            <!-- 管理者タブ -->
+            <div class="tab-content" id="adminTab">
+                <div class="admin-section">
+                    <h3>🔐 管理者パスワード</h3>
+                    <div class="admin-password">
+                        <input type="password" id="adminPassword" placeholder="管理者パスワードを入力">
+                        <button class="btn btn-small" onclick="unlockAdmin()">解除</button>
+                    </div>
+                </div>
+
+                <div class="admin-content" id="adminContent">
+                    <!-- ユーザー管理 -->
+                    <div class="admin-section">
+                        <h3>👥 ユーザー管理</h3>
+                        <button class="btn btn-small mb-10" onclick="showUserManagement()">ユーザー一覧を表示</button>
+                        <button class="btn btn-small btn-success mb-10" onclick="exportUserReportCSV()">ユーザーレポート CSV出力</button>
+                    </div>
+
+                    <!-- メーカー管理 -->
+                    <div class="admin-section">
+                        <h3>🏭 メーカー管理</h3>
+                        <div class="form-row mb-10">
+                            <input type="text" id="adminManufacturerName" placeholder="メーカー名を入力">
+                            <button class="btn btn-small" onclick="addManufacturerFromAdmin()">追加</button>
+                        </div>
+                        <ul class="admin-list" id="manufacturerList"></ul>
+                    </div>
+
+                    <!-- カテゴリー管理 -->
+                    <div class="admin-section">
+                        <h3>📂 カテゴリー管理</h3>
+                        <div class="form-row mb-10">
+                            <input type="text" id="adminCategoryName" placeholder="カテゴリー名を入力">
+                            <button class="btn btn-small" onclick="addCategoryFromAdmin()">追加</button>
+                        </div>
+                        <ul class="admin-list" id="categoryList"></ul>
+                    </div>
+
+                    <!-- 危険な操作 -->
+                    <div class="admin-section">
+                        <h3>⚠️ 危険な操作</h3>
+                        <button class="btn btn-danger" onclick="deleteAllInventory()">全在庫を削除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編集モーダル -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ 在庫編集</h3>
+                <button class="close-modal" onclick="closeEditModal()">×</button>
+            </div>
+            <div class="form-row">
+                <input type="text" id="editProductName" placeholder="商品名">
+                <select id="editCategory"></select>
+                <input type="number" id="editQuantity" placeholder="数量" min="0">
+                <input type="number" id="editUnitPrice" placeholder="単価" min="0">
+                <input type="text" id="editLocation" placeholder="保管場所">
+                <select id="editManufacturer"></select>
+                <input type="number" id="editExpiryDays" placeholder="期限日数（デフォルト730日）" min="1" value="730">
+            </div>
+            <div class="form-row">
+                <textarea id="editNotes" placeholder="備考"></textarea>
+            </div>
+            <div class="form-row">
+                <button class="btn" onclick="saveEdit()">保存</button>
+                <button class="btn btn-danger" onclick="closeEditModal()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ユーザー管理モーダル -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👥 ユーザー管理</h3>
+                <button class="close-modal" onclick="closeUserModal()">×</button>
+            </div>
+            <div id="userList"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            updateDoc, 
+            deleteDoc, 
+            doc, 
+            query, 
+            where,
+            serverTimestamp,
+            orderBy
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiু9nOAT5r7gDGZ_1LrJXvkWC3JpyEXSU",
+            authDomain: "frontier-inventory.firebaseapp.com",
+            projectId: "frontier-inventory",
+            storageBucket: "frontier-inventory.firebasestorage.app",
+            messagingSenderId: "878024030644",
+            appId: "1:878024030644:web:2c8e0b0f8e8c1a8e8f8e8e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // グローバル変数
+        window.db = db;
+        window.currentUser = null;
+        window.currentEditId = null;
+        window.allInventory = [];
+        window.allManufacturers = [];
+        window.allCategories = [];
+
+        // Firebase関数をグローバルに公開
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.query = query;
+        window.where = where;
+        window.serverTimestamp = serverTimestamp;
+        window.orderBy = orderBy;
+
+        console.log('✅ Firebase初期化完了');
+    </script>
+
+    <script>
+        // ==================== ログイン機能 ====================
+        window.login = async function() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+
+            if (!username) {
+                alert('ユーザー名を入力してください');
+                return;
+            }
+
+            if (password !== '2951') {
+                alert('パスワードが間違っています');
+                return;
+            }
+
+            // メールアドレス検証（Hayate以外）
+            if (username !== 'Hayate' && !username.includes('@')) {
+                alert('メールアドレス形式でユーザー名を入力してください');
+                return;
+            }
+
+            try {
+                // ユーザー検索
+                const usersRef = window.collection(window.db, 'users');
+                const userQuery = window.query(usersRef, window.where('username', '==', username));
+                const userSnapshot = await window.getDocs(userQuery);
+
+                let userId, userName;
+
+                if (userSnapshot.empty) {
+                    // 新規ユーザー登録
+                    const newUser = {
+                        username: username,
+                        createdAt: window.serverTimestamp(),
+                        isApproved: username === 'Hayate', // Hayateは自動承認
+                        isBlocked: false
+                    };
+                    const docRef = await window.addDoc(usersRef, newUser);
+                    userId = docRef.id;
+                    userName = username;
+
+                    if (username === 'Hayate') {
+                        alert('ようこそ、管理者！');
+                    } else {
+                        alert('新規ユーザーとして登録されました。管理者の承認をお待ちください。');
+                        return;
+                    }
+                } else {
+                    // 既存ユーザー
+                    const userData = userSnapshot.docs[0].data();
+                    userId = userSnapshot.docs[0].id;
+                    userName = userData.username;
+
+                    if (userData.isBlocked) {
+                        alert('このアカウントはブロックされています');
+                        return;
+                    }
+
+                    if (!userData.isApproved) {
+                        alert('管理者の承認待ちです');
+                        return;
+                    }
+                }
+
+                // ログイン成功
+                window.currentUser = { id: userId, name: userName };
+                document.getElementById('currentUserName').textContent = userName;
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+
+                // データ読み込み
+                await window.loadCategories();
+                await window.loadManufacturers();
+                await window.loadInventory();
+
+                console.log('✅ ログイン成功:', userName);
+            } catch (error) {
+                console.error('❌ ログインエラー:', error);
+                alert('ログインに失敗しました: ' + error.message);
+            }
+        };
+
+        // ログアウト
+        window.logout = function() {
+            window.currentUser = null;
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            console.log('✅ ログアウト');
+        };
+
+        // ==================== タブ切り替え ====================
+        window.switchTab = function(tabName) {
+            // タブボタンの切り替え
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // タブコンテンツの切り替え
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        };
+
+        // ==================== カテゴリー管理 ====================
+        window.loadCategories = async function() {
+            try {
+                console.log('📦 カテゴリー読み込み開始...');
+                const categoriesRef = window.collection(window.db, 'categories');
+                const snapshot = await window.getDocs(categoriesRef);
+                
+                window.allCategories = [];
+                snapshot.forEach(doc => {
+                    window.allCategories.push({ id: doc.id, ...doc.data() });
+                });
+
+                // ドロップダウン更新
+                updateCategoryDropdowns();
+                updateCategoryList();
+                
+                console.log('✅ カテゴリー読み込み完了:', window.allCategories.length + '件');
+            } catch (error) {
+                console.error('❌ カテゴリー読み込みエラー:', error);
+            }
+        };
+
+        function updateCategoryDropdowns() {
+            const dropdowns = ['category', 'editCategory'];
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">カテゴリーを選択...</option>';
+                select.innerHTML += '<option value="__NEW__">➕ 新しいカテゴリーを追加...</option>';
+                
+                window.allCategories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.name;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+
+                if (currentValue) select.value = currentValue;
+            });
+        }
+
+        function updateCategoryList() {
+            const list = document.getElementById('categoryList');
+            if (!list) return;
+
+            list.innerHTML = '';
+            window.allCategories.forEach(cat => {
+                const li = document.createElement('li');
+                li.className = 'admin-list-item';
+                li.innerHTML = `
+                    <span>${cat.name}</span>
+                    <button class="btn btn-small btn-danger" onclick="removeCategory('${cat.id}')">削除</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        window.addCategory = async function(categoryName) {
+            if (!categoryName || categoryName.trim() === '') {
+                alert('カテゴリー名を入力してください');
+                return;
+            }
+
+            try {
+                await window.addDoc(window.collection(window.db, 'categories'), {
+                    name: categoryName.trim(),
+                    createdAt: window.serverTimestamp()
+                });
+                alert('カテゴリーを追加しました: ' + categoryName);
+                await window.loadCategories();
+            } catch (error) {
+                console.error('❌ カテゴリー追加エラー:', error);
+                alert('カテゴリーの追加に失敗しました');
+            }
+        };
+
+        window.addCategoryFromAdmin = async function() {
+            const name = document.getElementById('adminCategoryName').value.trim();
+            if (name) {
+                await window.addCategory(name);
+                document.getElementById('adminCategoryName').value = '';
+            }
+        };
+
+        window.removeCategory = async function(categoryId) {
+            if (!confirm('このカテゴリーを削除しますか？')) return;
+
+            try {
+                await window.deleteDoc(window.doc(window.db, 'categories', categoryId));
+                alert('カテゴリーを削除しました');
+                await window.loadCategories();
+            } catch (error) {
+                console.error('❌ カテゴリー削除エラー:', error);
+                alert('カテゴリーの削除に失敗しました');
+            }
+        };
+
+        // カテゴリー選択時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const categorySelect = document.getElementById('category');
+            const editCategorySelect = document.getElementById('editCategory');
+
+            if (categorySelect) {
+                categorySelect.addEventListener('change', async function(e) {
+                    if (e.target.value === '__NEW__') {
+                        const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                        if (newCategory) {
+                            await window.addCategory(newCategory);
+                            e.target.value = newCategory;
+                        } else {
+                            e.target.value = '';
+                        }
+                    }
+                });
+            }
+
+            if (editCategorySelect) {
+                editCategorySelect.addEventListener('change', async function(e) {
+                    if (e.target.value === '__NEW__') {
+                        const newCategory = prompt('新しいカテゴリー名を入力してください:');
+                        if (newCategory) {
+                            await window.addCategory(newCategory);
+                            e.target.value = newCategory;
+                        } else {
+                            e.target.value = '';
+                        }
+                    }
+                });
+            }
+        });
+
+        // ==================== メーカー管理 ====================
+        window.loadManufacturers = async function() {
+            try {
+                console.log('📦 メーカー読み込み開始...');
+                const manufacturersRef = window.collection(window.db, 'manufacturers');
+                const snapshot = await window.getDocs(manufacturersRef);
+                
+                window.allManufacturers = [];
+                snapshot.forEach(doc => {
+                    window.allManufacturers.push({ id: doc.id, ...doc.data() });
+                });
+
+                // ドロップダウン更新
+                updateManufacturerDropdowns();
+                updateManufacturerList();
+                
+                console.log('✅ メーカー読み込み完了:', window.allManufacturers.length + '件');
+            } catch (error) {
+                console.error('❌ メーカー読み込みエラー:', error);
+            }
+        };
+
+        function updateManufacturerDropdowns() {
+            const dropdowns = ['manufacturer', 'editManufacturer'];
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">メーカーを選択...</option>';
+                select.innerHTML += '<option value="__NEW__">➕ 新しいメーカーを追加...</option>';
+                
+                window.allManufacturers.forEach(mfr => {
+                    const option = document.createElement('option');
+                    option.value = mfr.name;
+                    option.textContent = mfr.name;
+                    select.appendChild(option);
+                });
+
+                if (currentValue) select.value = currentValue;
+            });
+        }
+
+        function updateManufacturerList() {
+            const list = document.getElementById('manufacturerList');
+            if (!list) return;
+
+            list.innerHTML = '';
+            window.allManufacturers.forEach(mfr => {
+                const li = document.createElement('li');
+                li.className = 'admin-list-item';
+                li.innerHTML = `
+                    <span>${mfr.name}</span>
+                    <button class="btn btn-small btn-danger" onclick="deleteManufacturer('${mfr.id}')">削除</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        window.addManufacturer = async function(manufacturerName) {
+            if (!manufacturerName || manufacturerName.trim() === '') {
+                alert('メーカー名を入力してください');
+                return;
+            }
+
+            try {
+                await window.addDoc(window.collection(window.db, 'manufacturers'), {
+                    name: manufacturerName.trim(),
+                    createdAt: window.serverTimestamp()
+                });
+                alert('メーカーを追加しました: ' + manufacturerName);
+                await window.loadManufacturers();
+            } catch (error) {
+                console.error('❌ メーカー追加エラー:', error);
+                alert('メーカーの追加に失敗しました');
+            }
+        };
+
+        window.addManufacturerFromAdmin = async function() {
+            const name = document.getElementById('adminManufacturerName').value.trim();
+            if (name) {
+                await window.addManufacturer(name);
+                document.getElementById('adminManufacturerName').value = '';
+            }
+        };
+
+        window.deleteManufacturer = async function(manufacturerId) {
+            if (!confirm('このメーカーを削除しますか？')) return;
+
+            try {
+                await window.deleteDoc(window.doc(window.db, 'manufacturers', manufacturerId));
+                alert('メーカーを削除しました');
+                await window.loadManufacturers();
+            } catch (error) {
+                console.error('❌ メーカー削除エラー:', error);
+                alert('メーカーの削除に失敗しました');
+            }
+        };
+
+        // メーカー選択時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const manufacturerSelect = document.getElementById('manufacturer');
+            const editManufacturerSelect = document.getElementById('editManufacturer');
+
+            if (manufacturerSelect) {
+                manufacturerSelect.addEventListener('change', async function(e) {
+                    if (e.target.value === '__NEW__') {
+                        const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                        if (newManufacturer) {
+                            await window.addManufacturer(newManufacturer);
+                            e.target.value = newManufacturer;
+                        } else {
+                            e.target.value = '';
+                        }
+                    }
+                });
+            }
+
+            if (editManufacturerSelect) {
+                editManufacturerSelect.addEventListener('change', async function(e) {
+                    if (e.target.value === '__NEW__') {
+                        const newManufacturer = prompt('新しいメーカー名を入力してください:');
+                        if (newManufacturer) {
+                            await window.addManufacturer(newManufacturer);
+                            e.target.value = newManufacturer;
+                        } else {
+                            e.target.value = '';
+                        }
+                    }
+                });
+            }
+        });
+
+        console.log('✅ 全スクリプト読み込み完了');
+    </script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+    <script>
+        // ==================== 期限アラート ====================
+        window.currentExpiryFilter = null;
+        
+        window.filterByExpiry = function(filterType) {
+            window.currentExpiryFilter = filterType;
+            window.loadInventory();
+        };
+        
+        window.calculateExpiryStatus = function(createdAt, expiryDays = 730) {
+            if (!createdAt || !createdAt.toDate) return { level: 'normal', daysElapsed: 0, daysRemaining: 0 };
+            
+            const now = new Date();
+            const created = createdAt.toDate();
+            const elapsed = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+            const remaining = expiryDays - elapsed;
+            
+            if (elapsed >= expiryDays) {
+                return { level: 'danger', daysElapsed: elapsed, daysRemaining: remaining };
+            } else if (remaining <= 90) {
+                return { level: 'warning', daysElapsed: elapsed, daysRemaining: remaining };
+            } else {
+                return { level: 'normal', daysElapsed: elapsed, daysRemaining: remaining };
+            }
+        };
+
+        // ==================== 在庫管理 ====================
+        window.loadInventory = async function() {
+            try {
+                console.log('📦 在庫読み込み開始...');
+                const inventoryRef = window.collection(window.db, 'inventory');
+                const snapshot = await window.getDocs(inventoryRef);
+                
+                window.allInventory = [];
+                snapshot.forEach(doc => {
+                    window.allInventory.push({ id: doc.id, ...doc.data() });
+                });
+
+                // 期限フィルター適用
+                let filteredInventory = window.allInventory;
+                if (window.currentExpiryFilter) {
+                    filteredInventory = window.allInventory.filter(item => {
+                        const status = window.calculateExpiryStatus(item.createdAt, item.expiryDays || 730);
+                        if (window.currentExpiryFilter === 'danger') return status.level === 'danger';
+                        if (window.currentExpiryFilter === 'warning') return status.level === 'warning';
+                        if (window.currentExpiryFilter === 'normal') return status.level === 'normal';
+                        return true;
+                    });
+                }
+
+                displayInventory(filteredInventory);
+                displayRankings();
+                
+                console.log('✅ 在庫読み込み完了:', window.allInventory.length + '件');
+            } catch (error) {
+                console.error('❌ 在庫読み込みエラー:', error);
+                alert('在庫の読み込みに失敗しました: ' + error.message);
+            }
+        };
+
+        window.displayInventory = function(inventoryList) {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+
+            // 期限統計を計算
+            const stats = { danger: 0, warning: 0, normal: 0 };
+            window.allInventory.forEach(item => {
+                const status = window.calculateExpiryStatus(item.createdAt, item.expiryDays || 730);
+                stats[status.level]++;
+            });
+
+            // 統計バー追加
+            const statsBar = document.createElement('div');
+            statsBar.style.cssText = 'grid-column: 1/-1; display: flex; gap: 10px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px;';
+            statsBar.innerHTML = `
+                <button onclick="window.filterByExpiry(null)" style="flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 5px; background: white; cursor: pointer;">
+                    📋 全件: ${window.allInventory.length}
+                </button>
+                <button onclick="window.filterByExpiry('danger')" style="flex: 1; padding: 10px; border: 2px solid #e74c3c; border-radius: 5px; background: white; cursor: pointer;">
+                    ⚠️ 期限切れ: ${stats.danger}
+                </button>
+                <button onclick="window.filterByExpiry('warning')" style="flex: 1; padding: 10px; border: 2px solid #f39c12; border-radius: 5px; background: white; cursor: pointer;">
+                    🚨 警告(90日以内): ${stats.warning}
+                </button>
+                <button onclick="window.filterByExpiry('normal')" style="flex: 1; padding: 10px; border: 2px solid #27ae60; border-radius: 5px; background: white; cursor: pointer;">
+                    ✅ 正常: ${stats.normal}
+                </button>
+            `;
+            grid.appendChild(statsBar);
+
+            if (inventoryList.length === 0) {
+                grid.innerHTML += '<p style="grid-column: 1/-1; text-align: center; color: #999;">在庫がありません</p>';
+                return;
+            }
+
+            inventoryList.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'inventory-card';
+                
+                const createdAt = item.createdAt?.toDate ? item.createdAt.toDate().toLocaleString('ja-JP') : '不明';
+                const totalValue = (item.quantity || 0) * (item.unitPrice || 0);
+                
+                // 期限ステータス計算
+                const expiryStatus = window.calculateExpiryStatus(item.createdAt, item.expiryDays || 730);
+                let expiryBadge = '';
+                if (expiryStatus.level === 'danger') {
+                    expiryBadge = `<span style="background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">⚠️ 期限切れ (${-expiryStatus.daysRemaining}日超過)</span>`;
+                } else if (expiryStatus.level === 'warning') {
+                    expiryBadge = `<span style="background: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">🚨 残り${expiryStatus.daysRemaining}日</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${item.productName || '商品名なし'}${expiryBadge}</div>
+                            ${item.manufacturer ? `<div class="card-manufacturer">${item.manufacturer}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-label">カテゴリー</div>
+                        <div class="card-value">${item.category || '未設定'}</div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-label">数量 / 単価</div>
+                        <div class="card-value">${item.quantity || 0}個 / ¥${(item.unitPrice || 0).toLocaleString()}</div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-label">合計金額</div>
+                        <div class="card-value">¥${totalValue.toLocaleString()}</div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-label">保管場所</div>
+                        <div class="card-value">${item.location || '未設定'}</div>
+                    </div>
+                    ${item.notes ? `<div class="card-notes">📝 ${item.notes}</div>` : ''}
+                    <div class="card-footer">
+                        <div class="card-meta">
+                            ${item.userName || '不明'}<br>
+                            ${createdAt}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-small" onclick="openEditModal('${item.id}')">編集</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteInventory('${item.id}')">削除</button>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        };
+
+        window.addInventory = async function() {
+            const productName = document.getElementById('productName').value.trim();
+            const category = document.getElementById('category').value;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+            const location = document.getElementById('location').value.trim();
+            const manufacturer = document.getElementById('manufacturer').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            if (!productName) {
+                alert('商品名を入力してください');
+                return;
+            }
+
+            if (quantity <= 0) {
+                alert('数量は1以上を入力してください');
+                return;
+            }
+
+            if (unitPrice < 0) {
+                alert('単価は0以上を入力してください');
+                return;
+            }
+
+            if (!location) {
+                alert('保管場所を入力してください');
+                return;
+            }
+
+            try {
+                const newItem = {
+                    productName,
+                    category,
+                    quantity,
+                    unitPrice,
+                    location,
+                    manufacturer,
+                    notes,
+                    expiryDays: 730,  // デフォルト730日（2年）
+                    userId: window.currentUser.id,
+                    userName: window.currentUser.name,
+                    createdAt: window.serverTimestamp()
+                };
+
+                await window.addDoc(window.collection(window.db, 'inventory'), newItem);
+                alert('在庫を追加しました');
+
+                // フォームクリア
+                document.getElementById('productName').value = '';
+                document.getElementById('category').value = '';
+                document.getElementById('quantity').value = '';
+                document.getElementById('unitPrice').value = '';
+                document.getElementById('location').value = '';
+                document.getElementById('manufacturer').value = '';
+                document.getElementById('notes').value = '';
+
+                // 再読み込み
+                await window.loadInventory();
+            } catch (error) {
+                console.error('❌ 在庫追加エラー:', error);
+                alert('在庫の追加に失敗しました: ' + error.message);
+            }
+        };
+
+        window.deleteInventory = async function(inventoryId) {
+            if (!confirm('この在庫を削除しますか？')) return;
+
+            try {
+                await window.deleteDoc(window.doc(window.db, 'inventory', inventoryId));
+                alert('在庫を削除しました');
+                await window.loadInventory();
+            } catch (error) {
+                console.error('❌ 在庫削除エラー:', error);
+                alert('在庫の削除に失敗しました: ' + error.message);
+            }
+        };
+
+        // ==================== 在庫編集 ====================
+        window.openEditModal = function(inventoryId) {
+            const item = window.allInventory.find(inv => inv.id === inventoryId);
+            if (!item) return;
+
+            window.currentEditId = inventoryId;
+            
+            document.getElementById('editProductName').value = item.productName || '';
+            document.getElementById('editCategory').value = item.category || '';
+            document.getElementById('editQuantity').value = item.quantity || 0;
+            document.getElementById('editUnitPrice').value = item.unitPrice || 0;
+            document.getElementById('editLocation').value = item.location || '';
+            document.getElementById('editManufacturer').value = item.manufacturer || '';
+            document.getElementById('editNotes').value = item.notes || '';
+            document.getElementById('editExpiryDays').value = item.expiryDays || 730;
+
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        window.closeEditModal = function() {
+            window.currentEditId = null;
+            document.getElementById('editModal').classList.remove('active');
+        };
+
+        window.saveEdit = async function() {
+            if (!window.currentEditId) return;
+
+            const productName = document.getElementById('editProductName').value.trim();
+            const category = document.getElementById('editCategory').value;
+            const quantity = parseInt(document.getElementById('editQuantity').value) || 0;
+            const unitPrice = parseInt(document.getElementById('editUnitPrice').value) || 0;
+            const location = document.getElementById('editLocation').value.trim();
+            const manufacturer = document.getElementById('editManufacturer').value;
+            const notes = document.getElementById('editNotes').value.trim();
+            const expiryDays = parseInt(document.getElementById('editExpiryDays').value) || 730;
+
+            if (!productName) {
+                alert('商品名を入力してください');
+                return;
+            }
+
+            try {
+                const docRef = window.doc(window.db, 'inventory', window.currentEditId);
+                await window.updateDoc(docRef, {
+                    productName,
+                    category,
+                    quantity,
+                    unitPrice,
+                    location,
+                    manufacturer,
+                    notes,
+                    expiryDays,
+                    updatedAt: window.serverTimestamp()
+                });
+
+                alert('在庫を更新しました');
+                closeEditModal();
+                await window.loadInventory();
+            } catch (error) {
+                console.error('❌ 在庫更新エラー:', error);
+                alert('在庫の更新に失敗しました: ' + error.message);
+            }
+        };
+
+        // ==================== 検索・フィルター ====================
+        window.filterInventory = function() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchText) {
+                displayInventory(window.allInventory);
+                return;
+            }
+
+            const filtered = window.allInventory.filter(item => {
+                const productName = (item.productName || '').toLowerCase();
+                const manufacturer = (item.manufacturer || '').toLowerCase();
+                const category = (item.category || '').toLowerCase();
+                const location = (item.location || '').toLowerCase();
+                
+                return productName.includes(searchText) ||
+                       manufacturer.includes(searchText) ||
+                       category.includes(searchText) ||
+                       location.includes(searchText);
+            });
+
+            displayInventory(filtered);
+        };
+
+        // ==================== ランキング表示 ====================
+        window.displayRankings = function() {
+            const rankingDisplay = document.getElementById('rankingDisplay');
+            if (!rankingDisplay) return;
+
+            // Hayateとシステムを除外
+            const filteredInventory = window.allInventory.filter(item => 
+                item.userName !== 'Hayate' && item.userName !== 'システム'
+            );
+
+            if (filteredInventory.length === 0) {
+                rankingDisplay.innerHTML = '';
+                return;
+            }
+
+            // 数量ランキング
+            const quantityRanking = [...filteredInventory]
+                .sort((a, b) => (b.quantity || 0) - (a.quantity || 0))
+                .slice(0, 5);
+
+            // 単価ランキング
+            const priceRanking = [...filteredInventory]
+                .sort((a, b) => (b.unitPrice || 0) - (a.unitPrice || 0))
+                .slice(0, 5);
+
+            // ユーザー別登録数
+            const userCounts = {};
+            filteredInventory.forEach(item => {
+                const user = item.userName || '不明';
+                userCounts[user] = (userCounts[user] || 0) + 1;
+            });
+            const userCountRanking = Object.entries(userCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            // ユーザー別在庫金額
+            const userValues = {};
+            filteredInventory.forEach(item => {
+                const user = item.userName || '不明';
+                const value = (item.quantity || 0) * (item.unitPrice || 0);
+                userValues[user] = (userValues[user] || 0) + value;
+            });
+            const userValueRanking = Object.entries(userValues)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            rankingDisplay.innerHTML = `
+                <div class="ranking-card">
+                    <h4>📊 数量ランキング TOP5</h4>
+                    ${quantityRanking.map((item, i) => `
+                        <div class="ranking-item">
+                            <span>${i + 1}. ${item.productName}</span>
+                            <span>${item.quantity}個</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="ranking-card">
+                    <h4>💰 単価ランキング TOP5</h4>
+                    ${priceRanking.map((item, i) => `
+                        <div class="ranking-item">
+                            <span>${i + 1}. ${item.productName}</span>
+                            <span>¥${(item.unitPrice || 0).toLocaleString()}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="ranking-card">
+                    <h4>👤 ユーザー別登録数 TOP5</h4>
+                    ${userCountRanking.map(([user, count], i) => `
+                        <div class="ranking-item">
+                            <span>${i + 1}. ${user}</span>
+                            <span>${count}件</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="ranking-card">
+                    <h4>💵 ユーザー別在庫金額 TOP5</h4>
+                    ${userValueRanking.map(([user, value], i) => `
+                        <div class="ranking-item">
+                            <span>${i + 1}. ${user}</span>
+                            <span>¥${value.toLocaleString()}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+
+        // ==================== 管理者機能 ====================
+        window.unlockAdmin = function() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'admin2951') {
+                document.getElementById('adminContent').classList.add('unlocked');
+                alert('管理者機能が解除されました');
+                loadAdminData();
+            } else {
+                alert('パスワードが違います');
+            }
+        };
+
+        window.loadAdminData = async function() {
+            await window.loadManufacturers();
+            await window.loadCategories();
+        };
+
+        window.showUserManagement = async function() {
+            try {
+                const usersRef = window.collection(window.db, 'users');
+                const snapshot = await window.getDocs(usersRef);
+                
+                const users = [];
+                snapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+
+                showUserManagementModal(users);
+            } catch (error) {
+                console.error('❌ ユーザー読み込みエラー:', error);
+                alert('ユーザー情報の取得に失敗しました');
+            }
+        };
+
+        window.showUserManagementModal = function(users) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = `<p class="mb-20">登録ユーザー数: ${users.length}名</p>`;
+
+            const table = document.createElement('div');
+            table.innerHTML = users.map(user => `
+                <div class="admin-list-item">
+                    <div>
+                        <strong>${user.username}</strong><br>
+                        <span style="font-size: 12px; color: #999;">
+                            ${user.isApproved ? '✅ 承認済み' : '⏳ 承認待ち'}
+                            ${user.isBlocked ? ' | 🚫 ブロック中' : ''}
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        ${!user.isApproved ? `<button class="btn btn-small btn-success" onclick="approveUser('${user.id}')">承認</button>` : ''}
+                        ${!user.isBlocked ? `<button class="btn btn-small btn-danger" onclick="blockUser('${user.id}')">ブロック</button>` : 
+                          `<button class="btn btn-small" onclick="unblockUser('${user.id}')">解除</button>`}
+                    </div>
+                </div>
+            `).join('');
+
+            userList.appendChild(table);
+            document.getElementById('userModal').classList.add('active');
+        };
+
+        window.closeUserModal = function() {
+            document.getElementById('userModal').classList.remove('active');
+        };
+
+        window.approveUser = async function(userId) {
+            try {
+                await window.updateDoc(window.doc(window.db, 'users', userId), {
+                    isApproved: true
+                });
+                alert('ユーザーを承認しました');
+                await window.showUserManagement();
+            } catch (error) {
+                console.error('❌ ユーザー承認エラー:', error);
+                alert('ユーザーの承認に失敗しました');
+            }
+        };
+
+        window.blockUser = async function(userId) {
+            if (!confirm('このユーザーをブロックしますか？')) return;
+
+            try {
+                await window.updateDoc(window.doc(window.db, 'users', userId), {
+                    isBlocked: true
+                });
+                alert('ユーザーをブロックしました');
+                await window.showUserManagement();
+            } catch (error) {
+                console.error('❌ ユーザーブロックエラー:', error);
+                alert('ユーザーのブロックに失敗しました');
+            }
+        };
+
+        window.unblockUser = async function(userId) {
+            try {
+                await window.updateDoc(window.doc(window.db, 'users', userId), {
+                    isBlocked: false
+                });
+                alert('ユーザーのブロックを解除しました');
+                await window.showUserManagement();
+            } catch (error) {
+                console.error('❌ ユーザーブロック解除エラー:', error);
+                alert('ユーザーのブロック解除に失敗しました');
+            }
+        };
+
+        window.deleteAllInventory = async function() {
+            if (!confirm('本当に全在庫を削除しますか？この操作は取り消せません。')) return;
+            if (!confirm('最終確認: 全在庫を削除します。よろしいですか？')) return;
+
+            try {
+                const inventoryRef = window.collection(window.db, 'inventory');
+                const snapshot = await window.getDocs(inventoryRef);
+                
+                const deletePromises = [];
+                snapshot.forEach(doc => {
+                    deletePromises.push(window.deleteDoc(window.doc(window.db, 'inventory', doc.id)));
+                });
+
+                await Promise.all(deletePromises);
+                alert('全在庫を削除しました');
+                await window.loadInventory();
+            } catch (error) {
+                console.error('❌ 全在庫削除エラー:', error);
+                alert('全在庫の削除に失敗しました');
+            }
+        };
+
+        window.exportUserReportCSV = function() {
+            // Hayateとシステムを除外
+            const filteredInventory = window.allInventory.filter(item => 
+                item.userName !== 'Hayate' && item.userName !== 'システム'
+            );
+
+            // ユーザー別集計
+            const userStats = {};
+            filteredInventory.forEach(item => {
+                const user = item.userName || '不明';
+                if (!userStats[user]) {
+                    userStats[user] = {
+                        count: 0,
+                        totalQuantity: 0,
+                        totalValue: 0
+                    };
+                }
+                userStats[user].count++;
+                userStats[user].totalQuantity += item.quantity || 0;
+                userStats[user].totalValue += (item.quantity || 0) * (item.unitPrice || 0);
+            });
+
+            // CSV生成
+            let csv = '\uFEFF'; // BOM
+            csv += 'ユーザー名,登録数,総数量,総金額\n';
+            
+            Object.entries(userStats).forEach(([user, stats]) => {
+                csv += `${user},${stats.count},${stats.totalQuantity},${stats.totalValue}\n`;
+            });
+
+            // ダウンロード
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ユーザーレポート_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        console.log('✅ 在庫管理機能読み込み完了');
+    </script>
